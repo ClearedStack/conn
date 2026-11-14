@@ -1,0 +1,22 @@
+{
+  "slug": "conn",
+  "name": "Conn",
+  "formerly": "clearedstack-web",
+  "kind": "control-plane",
+  "namespace": "clearedstack",
+  "responsibility": "Serves the unified Command Portal, contractor-first tool catalog, pipeline explorer, live SSE status relay, and anonymous proof-of-work edit and candidate intake.",
+  "interfaces": [
+    "Sole public HTTPS ingress pod in clearedstack: Command Portal, tool catalog, pipeline item explorer, component registry, operational guides, live SSE stream, and anonymous intake",
+    "Read-only SQL over Logbook pub.* views using the pub_ro role",
+    "Subscribes to Muster GET /v1/feed SSE stream and forwards anonymous POST /v1/edits and POST /v1/items (site-form) over cluster-private HTTP with Kubernetes ServiceAccount bearer authentication"
+  ],
+  "repository": "conn",
+  "image": "conn",
+  "dependsOn": [
+    "logbook",
+    "muster"
+  ],
+  "memory": "128 MiB",
+  "version": "v0.2.0-draft",
+  "subTools": []
+}
