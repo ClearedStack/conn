@@ -963,7 +963,7 @@ func (s *Standin) handleNeedsSubtool(w http.ResponseWriter, worker string, raw [
 		return
 	}
 	it := s.items[entry.Subject]
-	if it.State != "recorded" && it.State != "observed" && it.State != "approved" {
+	if !itemStateCanPause(it.State) {
 		writeRefusal(w, refMoveNotAllowed)
 		return
 	}
@@ -1620,6 +1620,15 @@ func laneRank(lane string) int {
 	}
 }
 
+func itemStateCanPause(state string) bool {
+	switch state {
+	case "recorded", "observed", "approved", "building", "live", "parked", "linked", "merged", "retired":
+		return true
+	default:
+		return false
+	}
+}
+
 func workerCanHoldItemState(worker, state string) bool {
 	switch worker {
 	case "trawl":
@@ -1639,7 +1648,7 @@ func workerCanHoldItemState(worker, state string) bool {
 	case "chartroom":
 		return state == "building" || state == "linked" || state == "merged" || state == "retired"
 	case "tidegauge":
-		return state == "live"
+		return state == "live" || state == "linked" || state == "parked"
 	default:
 		return false
 	}
@@ -1670,7 +1679,9 @@ func nextItemStep(worker, fromState, toState, curLane string) (nextWorker, nextL
 		return "countersign", curLane, 0, true
 	case worker == "countersign" && fromState == "scored" && toState == "approved":
 		return "waybill", curLane, 0, true
-	case worker == "countersign" && fromState == "scored" && (toState == "parked" || toState == "rejected"):
+	case worker == "countersign" && fromState == "scored" && toState == "parked":
+		return "tidegauge", "backfill", sevenDays, true
+	case worker == "countersign" && fromState == "scored" && toState == "rejected":
 		return "", "", 0, true
 	case worker == "countersign" && fromState == "scored" && (toState == "linked" || toState == "merged"):
 		return "chartroom", curLane, 0, true
@@ -1685,10 +1696,12 @@ func nextItemStep(worker, fromState, toState, curLane string) (nextWorker, nextL
 	case worker == "shakedown" && fromState == "building" && toState == "building":
 		return "chartroom", curLane, 0, true
 	case worker == "shakedown" && fromState == "building" && toState == "parked":
-		return "", "", 0, true
+		return "tidegauge", "backfill", sevenDays, true
 	case worker == "chartroom" && fromState == "building" && toState == "live":
 		return "tidegauge", "backfill", sevenDays, true
-	case worker == "chartroom" && ((fromState == "linked" && toState == "linked") || (fromState == "merged" && toState == "merged") || (fromState == "retired" && toState == "retired")):
+	case worker == "chartroom" && fromState == "linked" && toState == "linked":
+		return "tidegauge", "backfill", sevenDays, true
+	case worker == "chartroom" && ((fromState == "merged" && toState == "merged") || (fromState == "retired" && toState == "retired")):
 		return "", "", 0, true
 	case worker == "tidegauge" && fromState == "live" && toState == "live":
 		return "tidegauge", "backfill", sevenDays, true
@@ -1696,6 +1709,14 @@ func nextItemStep(worker, fromState, toState, curLane string) (nextWorker, nextL
 		return "chartroom", "urgent", 0, true
 	case worker == "tidegauge" && fromState == "live" && toState == "building":
 		return "waybill", "urgent", 0, true
+	case worker == "tidegauge" && fromState == "linked" && toState == "linked":
+		return "tidegauge", "backfill", sevenDays, true
+	case worker == "tidegauge" && fromState == "linked" && toState == "observed":
+		return "assay", "urgent", 0, true
+	case worker == "tidegauge" && fromState == "parked" && toState == "parked":
+		return "tidegauge", "backfill", sevenDays, true
+	case worker == "tidegauge" && fromState == "parked" && toState == "observed":
+		return "assay", "urgent", 0, true
 	default:
 		return "", "", 0, false
 	}

@@ -47,17 +47,17 @@ type savedExpect struct {
 	Stream *string         `json:"stream,omitempty"`
 }
 
-// TestReplayAll52ContractExamples replays all 52 saved Muster Contract v1 JSON
+// TestReplayAll56ContractExamples replays all 56 saved Muster Contract v1 JSON
 // examples from testdata/contract/v1/examples/ with zero skips, verifying both
-// Standin fidelity across all 52 files and Client behavior on Conn calls,
+// Standin fidelity across all 56 files and Client behavior on Conn calls,
 // healthz, SSE streams, and every refusal code.
-func TestReplayAll52ContractExamples(t *testing.T) {
+func TestReplayAll56ContractExamples(t *testing.T) {
 	paths, err := filepath.Glob(filepath.Join(contractExamplesDir, "*.json"))
 	if err != nil {
 		t.Fatal(err)
 	}
-	if len(paths) != 52 {
-		t.Fatalf("found %d contract examples in %s, want exactly 52", len(paths), contractExamplesDir)
+	if len(paths) != 56 {
+		t.Fatalf("found %d contract examples in %s, want exactly 56", len(paths), contractExamplesDir)
 	}
 
 	replayed := 0
@@ -150,8 +150,8 @@ func TestReplayAll52ContractExamples(t *testing.T) {
 		replayed++
 	}
 
-	if replayed != 52 {
-		t.Fatalf("replayed %d examples, want 52", replayed)
+	if replayed != 56 {
+		t.Fatalf("replayed %d examples, want 56", replayed)
 	}
 	if connClientCalls < 8 {
 		t.Fatalf("expected at least 8 Conn Client calls exercised, got %d", connClientCalls)
