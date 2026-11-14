@@ -1,0 +1,76 @@
+# Default-deny Ingress and Egress for Conn in clearedstack, opening only:
+#   - Ingress on TCP 8080 (Conn is the sole public entry pod behind Ingress).
+#   - Egress to kube-system DNS (53 UDP/TCP), Logbook in clearedstack (5432 TCP),
+#     and Muster in clearedstack (8080 and 80 TCP).
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: conn-default-deny
+  namespace: clearedstack
+  labels:
+    app.kubernetes.io/name: conn
+    app.kubernetes.io/part-of: clearedstack
+    app.kubernetes.io/component: control-plane
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: conn
+  policyTypes:
+    - Ingress
+    - Egress
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: conn
+  namespace: clearedstack
+  labels:
+    app.kubernetes.io/name: conn
+    app.kubernetes.io/part-of: clearedstack
+    app.kubernetes.io/component: control-plane
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: conn
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - ports:
+        - protocol: TCP
+          port: 8080
+  egress:
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+          podSelector:
+            matchLabels:
+              k8s-app: kube-dns
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: clearedstack
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/name: logbook
+      ports:
+        - protocol: TCP
+          port: 5432
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: clearedstack
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/name: muster
+      ports:
+        - protocol: TCP
+          port: 8080
+        - protocol: TCP
+          port: 80
