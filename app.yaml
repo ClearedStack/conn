@@ -1,0 +1,7 @@
+name: conn
+namespace: clearedstack
+image: conn
+digest: sha256:0000000000000000000000000000000000000000000000000000000000000000
+replicas: 1
+port: 8080
+memory: 128Mi

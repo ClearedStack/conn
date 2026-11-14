@@ -1,0 +1,4 @@
+/conn
+/dist/
+*.test
+*.out

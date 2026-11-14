@@ -1,0 +1,39 @@
+{
+  "elements": {
+    "catalog.sample-calculator.description": {
+      "repository": "conn",
+      "file": "internal/pubstore/memory.go",
+      "kind": "DATA"
+    },
+    "catalog.sample-clause-matrix.description": {
+      "repository": "conn",
+      "file": "internal/pubstore/memory.go",
+      "kind": "DATA"
+    },
+    "catalog.sample-scoping-handbook.description": {
+      "repository": "conn",
+      "file": "internal/pubstore/memory.go",
+      "kind": "DATA"
+    },
+    "catalog.sample-pool-estimator.description": {
+      "repository": "conn",
+      "file": "internal/pubstore/memory.go",
+      "kind": "DATA"
+    },
+    "catalog.sample-repealed-notice-helper.description": {
+      "repository": "conn",
+      "file": "internal/pubstore/memory.go",
+      "kind": "DATA"
+    },
+    "sextant.sample-portal.options": {
+      "repository": "sextant",
+      "file": "tools/sample-portal/options.json",
+      "kind": "CONFIG"
+    },
+    "assay.sample-profile.report": {
+      "repository": "assay",
+      "file": "tools/sample-profile/README.md",
+      "kind": "ISSUE"
+    }
+  }
+}

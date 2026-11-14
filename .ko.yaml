@@ -1,0 +1,15 @@
+# ko build configuration for Conn.
+# Base image is mirrored in Lazarette and pinned by sha256 digest at release time.
+defaultBaseImage: lazarette.clearedstack.svc.cluster.local:5000/static@sha256:0000000000000000000000000000000000000000000000000000000000000000
+builds:
+  - id: conn
+    dir: .
+    main: ./cmd/conn
+    env:
+      - CGO_ENABLED=0
+    flags:
+      - -trimpath
+    ldflags:
+      - -s -w
+    platforms:
+      - linux/arm64
